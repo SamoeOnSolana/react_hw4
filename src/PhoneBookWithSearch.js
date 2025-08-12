@@ -1,0 +1,202 @@
+import React, { useState } from 'react';
+
+const PhoneBookWithSearch = () => {
+  const [users, setUsers] = useState([]);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: ''
+  });
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (formData.firstName && formData.lastName && formData.email && formData.phone) {
+      const newUser = {
+        id: Date.now(),
+        ...formData
+      };
+      setUsers(prev => [...prev, newUser]);
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: ''
+      });
+    }
+  };
+
+  const filteredUsers = users.filter(user =>
+    user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div style={{border: '1px solid orange', padding: '20px', margin: '10px'}}>
+      <h2>завдання 4</h2>
+      
+      <div style={{border: '1px solid purple', padding: '15px', margin: '10px'}}>
+        <h3>Телефонна книга з пошуком</h3>
+        
+        <UserForm 
+          formData={formData}
+          onInputChange={handleInputChange}
+          onSubmit={handleSubmit}
+        />
+        
+        <SearchBar 
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+        />
+        
+        <UserListWithSearch 
+          users={filteredUsers}
+          totalUsers={users.length}
+          searchTerm={searchTerm}
+        />
+      </div>
+    </div>
+  );
+};
+
+const UserForm = ({ formData, onInputChange, onSubmit }) => {
+  return (
+    <form onSubmit={onSubmit} style={{border: '1px solid green', padding: '15px', margin: '10px'}}>
+      <h4>Додати користувача:</h4>
+      
+      <div style={{marginBottom: '10px'}}>
+        <label>Ім'я:</label>
+        <input
+          type="text"
+          name="firstName"
+          value={formData.firstName}
+          onChange={onInputChange}
+          required
+          style={{marginLeft: '10px', padding: '5px'}}
+        />
+      </div>
+      
+      <div style={{marginBottom: '10px'}}>
+        <label>Прізвище:</label>
+        <input
+          type="text"
+          name="lastName"
+          value={formData.lastName}
+          onChange={onInputChange}
+          required
+          style={{marginLeft: '10px', padding: '5px'}}
+        />
+      </div>
+      
+      <div style={{marginBottom: '10px'}}>
+        <label>Email:</label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={onInputChange}
+          required
+          style={{marginLeft: '10px', padding: '5px'}}
+        />
+      </div>
+      
+      <div style={{marginBottom: '15px'}}>
+        <label>Телефон:</label>
+        <input
+          type="tel"
+          name="phone"
+          value={formData.phone}
+          onChange={onInputChange}
+          required
+          style={{marginLeft: '10px', padding: '5px'}}
+        />
+      </div>
+      
+      <button type="submit" style={{
+        padding: '10px 20px',
+        backgroundColor: 'lightblue',
+        border: '1px solid blue',
+        borderRadius: '5px',
+        cursor: 'pointer'
+      }}>
+        Додати користувача
+      </button>
+    </form>
+  );
+};
+
+const SearchBar = ({ searchTerm, onSearchChange }) => {
+  return (
+    <div style={{border: '1px solid blue', padding: '15px', margin: '10px'}}>
+      <h4>Пошук за прізвищем:</h4>
+      <input
+        type="text"
+        placeholder="Введіть прізвище для пошуку..."
+        value={searchTerm}
+        onChange={(e) => onSearchChange(e.target.value)}
+        style={{
+          width: '100%',
+          padding: '10px',
+          fontSize: '1rem',
+          border: '2px solid lightblue',
+          borderRadius: '5px'
+        }}
+      />
+    </div>
+  );
+};
+
+const UserListWithSearch = ({ users, totalUsers, searchTerm }) => {
+  if (totalUsers === 0) {
+    return (
+      <div style={{border: '1px solid orange', padding: '15px', margin: '10px'}}>
+        <h4>Список користувачів:</h4>
+        <p>Поки що немає користувачів</p>
+      </div>
+    );
+  }
+
+  if (searchTerm && users.length === 0) {
+    return (
+      <div style={{border: '1px solid orange', padding: '15px', margin: '10px'}}>
+        <h4>Результати пошуку:</h4>
+        <p>Користувачів з прізвищем "{searchTerm}" не знайдено</p>
+        <p>Всього користувачів: {totalUsers}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{border: '1px solid orange', padding: '15px', margin: '10px'}}>
+      <h4>
+        {searchTerm ? `Результати пошуку "${searchTerm}"` : 'Список користувачів'} 
+        ({users.length} з {totalUsers})
+      </h4>
+      
+      {users.map(user => (
+        <div key={user.id} style={{
+          border: '1px solid gray',
+          padding: '10px',
+          margin: '10px 0',
+          borderRadius: '5px',
+          backgroundColor: 'lightgray'
+        }}>
+          <p><strong>Ім'я:</strong> {user.firstName}</p>
+          <p><strong>Прізвище:</strong> {user.lastName}</p>
+          <p><strong>Email:</strong> {user.email}</p>
+          <p><strong>Телефон:</strong> {user.phone}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default PhoneBookWithSearch;
